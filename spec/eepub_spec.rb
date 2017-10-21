@@ -4,7 +4,7 @@ require 'tempfile'
 require 'zip'
 
 RSpec.describe Eepub do
-  example do
+  example 'read title' do
     epub = Eepub.load_from(file_fixture('Metamorphosis-jackson.epub'))
 
     expect(epub.title).to eq 'Metamorphosis '
@@ -28,8 +28,6 @@ RSpec.describe Eepub do
     orig = Eepub.load_from(file_fixture('Metamorphosis-jackson.epub'))
     dest = Tempfile.create
     orig.save_to dest.path
-
-    saved = Eepub.load_from(dest.path)
 
     Zip::File.open dest.path do |zip|
       mimetype = zip.find_entry('mimetype')
