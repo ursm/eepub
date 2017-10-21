@@ -1,5 +1,7 @@
 require 'bundler/setup'
-require 'epubm'
+require 'eepub'
+
+require 'pathname'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -11,4 +13,10 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.include Module.new {
+    def file_fixture(path)
+      Pathname.new(__dir__).join('fixtures/files', path)
+    end
+  }
 end
