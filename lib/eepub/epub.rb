@@ -19,7 +19,7 @@ module Eepub
     attr_writer :title
 
     def save_to(dest_path)
-      FileUtils.cp @path, dest_path
+      FileUtils.cp @path, dest_path unless @path == dest_path
 
       Zip::File.open dest_path do |zip|
         entry      = package_entry(zip)
