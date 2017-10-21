@@ -28,7 +28,11 @@ epub = Eepub.load_from('path/to/example.epub')
 epub.title #=> 'Example book'
 epub.title = 'UPDATED'
 
-epub.save_to 'path/to/updated.epub'
+# in-place update
+epub.save!
+
+# save to another file
+epub.save! to: 'path/to/updated.epub'
 ```
 
 ## Development

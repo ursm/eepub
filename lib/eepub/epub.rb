@@ -8,6 +8,8 @@ module Eepub
       @path = path
     end
 
+    attr_reader :path
+
     def title
       @title ||= Zip::File.open(@path) {|zip|
         package_xml = Nokogiri::XML.parse(package_entry(zip).get_input_stream)
@@ -18,10 +20,10 @@ module Eepub
 
     attr_writer :title
 
-    def save_to(dest_path)
-      FileUtils.cp @path, dest_path unless @path == dest_path
+    def save!(to: path)
+      FileUtils.cp path, to unless path == to
 
-      Zip::File.open dest_path do |zip|
+      Zip::File.open to do |zip|
         entry      = package_entry(zip)
         xml        = Nokogiri::XML.parse(entry.get_input_stream)
         title_node = xml.at_xpath('//dc:title', dc: 'http://purl.org/dc/elements/1.1/')
