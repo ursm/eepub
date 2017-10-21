@@ -41,15 +41,12 @@ module Eepub
     private
 
     def package_entry(zip)
-      container_xml = Nokogiri::XML.parse(container_entry(zip).get_input_stream)
+      container_entry = zip.find_entry('META-INF/container.xml')
+      container_xml   = Nokogiri::XML.parse(container_entry.get_input_stream)
 
       path = container_xml.at_xpath('//container:rootfile/@full-path', container: 'urn:oasis:names:tc:opendocument:xmlns:container').value
 
       zip.find_entry(path)
-    end
-
-    def container_entry(zip)
-      zip.find_entry('META-INF/container.xml')
     end
   end
 end
