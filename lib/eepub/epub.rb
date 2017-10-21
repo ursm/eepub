@@ -14,7 +14,7 @@ module Eepub
       @title ||= Zip::File.open(@path) {|zip|
         package_xml = REXML::Document.new(package_entry(zip).get_input_stream)
 
-        package_xml.elements['//dc:title'].text
+        REXML::XPath.first(package_xml, '//dc:title', 'dc' => 'http://purl.org/dc/elements/1.1/').text
       }
     end
 
@@ -26,7 +26,7 @@ module Eepub
       Zip::File.open to do |zip|
         entry      = package_entry(zip)
         xml        = REXML::Document.new(entry.get_input_stream)
-        title_node = xml.elements['//dc:title']
+        title_node = REXML::XPath.first(xml, '//dc:title', 'dc' => 'http://purl.org/dc/elements/1.1/')
 
         title_node.text = title
 
@@ -43,7 +43,7 @@ module Eepub
     def package_entry(zip)
       container_entry = zip.find_entry('META-INF/container.xml')
       container_xml   = REXML::Document.new(container_entry.get_input_stream)
-      path            = container_xml.elements['//rootfile/@full-path'].value
+      path            = REXML::XPath.first(container_xml, '//container:rootfile/@full-path', 'container' => 'urn:oasis:names:tc:opendocument:xmlns:container').value
 
       zip.find_entry(path)
     end
