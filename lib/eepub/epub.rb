@@ -40,7 +40,7 @@ module Eepub
 
       Zip::File.open to do |zip|
         rootfile_entry = rootfile_entry(zip)
-        rootfile_doc   = REXML::Document.new(rootfile_entry.get_input_stream)
+        rootfile_doc   = rootfile_entry.get_input_stream(&REXML::Document.method(:new))
         title_elem     = REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc'))
 
         title_elem.text = title
@@ -56,9 +56,8 @@ module Eepub
     private
 
     def rootfile_entry(zip)
-      container_entry = zip.find_entry('META-INF/container.xml')
-      container_doc   = REXML::Document.new(container_entry.get_input_stream)
-      rootfile_path   = REXML::XPath.first(container_doc, '//container:rootfile/@full-path', XMLNS.slice('container')).value
+      container_doc = zip.find_entry('META-INF/container.xml').get_input_stream(&REXML::Document.method(:new))
+      rootfile_path = REXML::XPath.first(container_doc, '//container:rootfile/@full-path', XMLNS.slice('container')).value
 
       zip.find_entry(rootfile_path)
     end
