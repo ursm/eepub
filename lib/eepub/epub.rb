@@ -45,7 +45,7 @@ module Eepub
         REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc')).text = title
 
         zip.get_output_stream rootfile_entry.name do |stream|
-          stream.write rootfile_doc.to_s
+          rootfile_doc.write stream
         end
 
         zip.commit
