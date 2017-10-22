@@ -41,9 +41,8 @@ module Eepub
       Zip::File.open to do |zip|
         rootfile_entry = rootfile_entry(zip)
         rootfile_doc   = rootfile_entry.get_input_stream(&REXML::Document.method(:new))
-        title_elem     = REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc'))
 
-        title_elem.text = title
+        REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc')).text = title
 
         zip.get_output_stream rootfile_entry.name do |stream|
           stream.write rootfile_doc.to_s
