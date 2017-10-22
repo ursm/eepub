@@ -27,7 +27,7 @@ module Eepub
 
     def title
       @title ||= Zip::File.open(path) {|zip|
-        rootfile_doc = REXML::Document.new(rootfile_entry(zip).get_input_stream)
+        rootfile_doc = rootfile_entry(zip).get_input_stream(&REXML::Document.method(:new))
 
         REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc')).text
       }
