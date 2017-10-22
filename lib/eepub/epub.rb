@@ -2,22 +2,22 @@ require 'fileutils'
 require 'rexml/document'
 require 'zip'
 
+using Module.new {
+  refine Hash do
+    def slice(*keys)
+      keys.each_with_object({}) {|k, h|
+        h[k] = self[k]
+      }
+    end
+  end
+} unless {}.respond_to?(:slice)
+
 module Eepub
   class Epub
     XMLNS = {
       'container' => 'urn:oasis:names:tc:opendocument:xmlns:container',
       'dc'        => 'http://purl.org/dc/elements/1.1/',
     }
-
-    using Module.new {
-      refine Hash do
-        def slice(*keys)
-          keys.each_with_object({}) {|k, h|
-            h[k] = self[k]
-          }
-        end
-      end
-    } unless {}.respond_to?(:slice)
 
     def initialize(path)
       @path = path
@@ -26,10 +26,10 @@ module Eepub
     attr_reader :path
 
     def title
-      @title ||= Zip::File.open(@path) {|zip|
-        package_xml = REXML::Document.new(package_entry(zip).get_input_stream)
+      @title ||= Zip::File.open(path) {|zip|
+        rootfile_doc = REXML::Document.new(rootfile_entry(zip).get_input_stream)
 
-        REXML::XPath.first(package_xml, '//dc:title', XMLNS.slice('dc')).text
+        REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc')).text
       }
     end
 
@@ -39,14 +39,14 @@ module Eepub
       FileUtils.cp path, to unless path == to
 
       Zip::File.open to do |zip|
-        entry      = package_entry(zip)
-        xml        = REXML::Document.new(entry.get_input_stream)
-        title_node = REXML::XPath.first(xml, '//dc:title', XMLNS.slice('dc'))
+        rootfile_entry = rootfile_entry(zip)
+        rootfile_doc   = REXML::Document.new(rootfile_entry.get_input_stream)
+        title_elem     = REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc'))
 
-        title_node.text = title
+        title_elem.text = title
 
-        zip.get_output_stream entry.name do |stream|
-          stream.write xml.to_s
+        zip.get_output_stream rootfile_entry.name do |stream|
+          stream.write rootfile_doc.to_s
         end
 
         zip.commit
@@ -55,12 +55,12 @@ module Eepub
 
     private
 
-    def package_entry(zip)
+    def rootfile_entry(zip)
       container_entry = zip.find_entry('META-INF/container.xml')
-      container_xml   = REXML::Document.new(container_entry.get_input_stream)
-      path            = REXML::XPath.first(container_xml, '//container:rootfile/@full-path', XMLNS.slice('container')).value
+      container_doc   = REXML::Document.new(container_entry.get_input_stream)
+      rootfile_path   = REXML::XPath.first(container_doc, '//container:rootfile/@full-path', XMLNS.slice('container')).value
 
-      zip.find_entry(path)
+      zip.find_entry(rootfile_path)
     end
   end
 end
