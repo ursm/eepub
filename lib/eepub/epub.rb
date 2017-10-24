@@ -29,7 +29,7 @@ module Eepub
       @title ||= Zip::File.open(path) {|zip|
         rootfile_doc = parse_xml(find_rootfile_entry(zip))
 
-        REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc')).text
+        get_title_element(rootfile_doc).text
       }
     end
 
@@ -42,7 +42,7 @@ module Eepub
         rootfile_entry = find_rootfile_entry(zip)
         rootfile_doc   = parse_xml(rootfile_entry)
 
-        REXML::XPath.first(rootfile_doc, '//dc:title', XMLNS.slice('dc')).text = title
+        get_title_element(rootfile_doc).text = title
 
         zip.get_output_stream rootfile_entry.name, &rootfile_doc.method(:write)
         zip.commit
@@ -60,6 +60,10 @@ module Eepub
 
     def parse_xml(entry)
       entry.get_input_stream(&REXML::Document.method(:new))
+    end
+
+    def get_title_element(doc)
+      REXML::XPath.first(doc, '//dc:title', XMLNS.slice('dc'))
     end
   end
 end
