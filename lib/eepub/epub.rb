@@ -59,7 +59,8 @@ module Eepub
     end
 
     def parse_xml(entry)
-      entry.get_input_stream(&REXML::Document.method(:new))
+      content = entry.get_input_stream.read
+      REXML::Document.new(content)
     end
 
     def get_title_element(doc)

@@ -11,6 +11,11 @@ RSpec.describe Eepub do
     expect(epub.title).to eq 'Metamorphosis '
   end
 
+  example 'read title in multibyte' do
+    epub = Eepub.load_from(file_fixture('test-epub3.epub'))
+    expect(epub.title).to eq 'テストあいうえお［⓴⓸❿㉓㊿ⓚ㋚㊤㊧㈱］'
+  end
+
   example 'change title and save' do
     orig = Eepub.load_from(file_fixture('Metamorphosis-jackson.epub'))
     orig.title = 'foo <bar>'
