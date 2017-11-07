@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-require 'eepub/version'
-
 module Eepub
-  autoload :Epub, 'eepub/epub'
+  autoload :Epub,    'eepub/epub'
+  autoload :VERSION, 'eepub/version'
 
   class << self
     def load_from(path)
