@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'eepub/version'
 
 module Eepub
